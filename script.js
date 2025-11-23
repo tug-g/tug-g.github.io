@@ -1,12 +1,12 @@
 // Blog posts
 const posts = [
-    { title: "Welcome to Estariot", content: "This is the first post! More content coming soon." },
-    { title: "Why I Created This Blog", content: "I wanted a place to share my thoughts and projects." }
+    { title: "1", content: "2" },
+    { title: "3", content: "4" }
 ];
 
 // Extras
 const extras = [
-    { title: "Bonus Content", content: "Here is some extra content for the blog!" }
+    { title: "5", content: "6" }
 ];
 
 // DOM references
@@ -35,6 +35,28 @@ function loadExtras() {
         extrasContainer.appendChild(div);
     });
 }
+
+// Scroll buttons
+latestPostBtn.onclick = () => { window.location.hash = "#posts"; };
+latestExtraBtn.onclick = () => { window.location.hash = "#extras"; };
+
+// Theme toggle
+themeToggleBtn.onclick = () => {
+    const body = document.body;
+    if (body.getAttribute("data-theme") === "light") {
+        body.setAttribute("data-theme", "dark");
+        themeToggleBtn.textContent = "Light Mode";
+    } else {
+        body.setAttribute("data-theme", "light");
+        themeToggleBtn.textContent = "Dark Mode";
+    }
+};
+
+// Initialize
+window.onload = () => {
+    loadPosts();
+    loadExtras();
+};
 
 // Scroll buttons
 latestPostBtn.onclick = () => { window.location.hash = "#posts"; };
