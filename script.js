@@ -1,21 +1,12 @@
 // Blog posts
 const posts = [
-    {
-        title: "Welcome to My Blog",
-        content: "This is the first post on my blog! More content coming soon."
-    },
-    {
-        title: "Why I Created This Blog",
-        content: "I wanted a place to share my thoughts and projects. Stay tuned!"
-    }
+    { title: "Welcome to Estariot", content: "This is the first post! More content coming soon." },
+    { title: "Why I Created This Blog", content: "I wanted a place to share my thoughts and projects." }
 ];
 
-// Extra content
+// Extras
 const extras = [
-    {
-        title: "Bonus Artwork",
-        content: "Here is a small piece of extra content for the blog!"
-    }
+    { title: "Bonus Content", content: "Here is some extra content for the blog!" }
 ];
 
 // DOM references
@@ -23,8 +14,10 @@ const postsContainer = document.getElementById("posts-container");
 const extrasContainer = document.getElementById("extras-container");
 const latestPostBtn = document.getElementById("latest-post-btn");
 const latestExtraBtn = document.getElementById("latest-extra-btn");
+const themeToggleBtn = document.getElementById("theme-toggle");
 
-// Load postsunction loadPosts() {
+// Load posts
+function loadPosts() {
     posts.forEach(post => {
         const div = document.createElement("div");
         div.className = "post";
@@ -43,13 +36,20 @@ function loadExtras() {
     });
 }
 
-// Redirect buttons
-latestPostBtn.onclick = () => {
-    window.location.hash = "#posts";
-};
+// Scroll buttons
+latestPostBtn.onclick = () => { window.location.hash = "#posts"; };
+latestExtraBtn.onclick = () => { window.location.hash = "#extras"; };
 
-latestExtraBtn.onclick = () => {
-    window.location.hash = "#extras";
+// Theme toggle
+themeToggleBtn.onclick = () => {
+    const body = document.body;
+    if (body.getAttribute("data-theme") === "light") {
+        body.setAttribute("data-theme", "dark");
+        themeToggleBtn.textContent = "Light Mode";
+    } else {
+        body.setAttribute("data-theme", "light");
+        themeToggleBtn.textContent = "Dark Mode";
+    }
 };
 
 // Initialize
