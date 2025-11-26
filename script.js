@@ -1,15 +1,14 @@
-// Blog posts
+// Data
 const posts = [
-    { title: "1", content: "2" },
+    { title: "1", content: "1" },
     { title: "3", content: "4" }
 ];
 
-// Extras
 const extras = [
     { title: "5", content: "6" }
 ];
 
-// DOM references
+// DOM
 const postsContainer = document.getElementById("posts-container");
 const extrasContainer = document.getElementById("extras-container");
 const latestPostBtn = document.getElementById("latest-post-btn");
@@ -18,6 +17,7 @@ const themeToggleBtn = document.getElementById("theme-toggle");
 
 // Load posts
 function loadPosts() {
+    if (!postsContainer) return;
     posts.forEach(post => {
         const div = document.createElement("div");
         div.className = "post";
@@ -28,6 +28,7 @@ function loadPosts() {
 
 // Load extras
 function loadExtras() {
+    if (!extrasContainer) return;
     extras.forEach(extra => {
         const div = document.createElement("div");
         div.className = "extra";
@@ -36,46 +37,25 @@ function loadExtras() {
     });
 }
 
-// Scroll buttons
-latestPostBtn.onclick = () => { window.location.hash = "#posts"; };
-latestExtraBtn.onclick = () => { window.location.hash = "#extras"; };
+// Theme toggle 
+if (themeToggleBtn) {
+    themeToggleBtn.onclick = () => {
+        const body = document.body;
+        const current = body.getAttribute("data-theme");
 
-// Theme toggle
-themeToggleBtn.onclick = () => {
-    const body = document.body;
-    if (body.getAttribute("data-theme") === "light") {
-        body.setAttribute("data-theme", "dark");
-        themeToggleBtn.textContent = "Light Mode";
-    } else {
-        body.setAttribute("data-theme", "light");
-        themeToggleBtn.textContent = "Dark Mode";
-    }
-};
-
-// Initialize
-window.onload = () => {
-    loadPosts();
-    loadExtras();
-};
-
-// Scroll buttons
-latestPostBtn.onclick = () => { window.location.hash = "#posts"; };
-latestExtraBtn.onclick = () => { window.location.hash = "#extras"; };
-
-// Theme toggle
-themeToggleBtn.onclick = () => {
-    const body = document.body;
-    if (body.getAttribute("data-theme") === "light") {
-        body.setAttribute("data-theme", "dark");
-        themeToggleBtn.textContent = "Light Mode";
-    } else {
-        body.setAttribute("data-theme", "light");
-        themeToggleBtn.textContent = "Dark Mode";
-    }
-};
+        if (current === "light") {
+            body.setAttribute("data-theme", "dark");
+            themeToggleBtn.textContent = "Light Mode";
+        } else {
+            body.setAttribute("data-theme", "light");
+            themeToggleBtn.textContent = "Dark Mode";
+        }
+    };
+}
 
 // Initialize
 window.onload = () => {
     loadPosts();
     loadExtras();
 };
+
