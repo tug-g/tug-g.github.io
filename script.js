@@ -55,13 +55,15 @@ async function loadLatest() {
 
     if (!postsArea && !extrasArea) return;
 
-    const posts = await loadIndex("posts");
-    const extras = await loadIndex("extras");
+    let posts = await loadIndex("posts");
+    let extras = await loadIndex("posts");
+
+    posts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    extras = extras.sort((a,b) => Date(b.date) - new Date(a.date));
 
     if (postsArea) {
         postsArea.innerHTML = posts
-            .slice(-2)
-            .reverse()
+            .slice(0, 2)
             .map(p => `
                 <div class="preview-item">
                     <a href="view.html?type=posts&file=${p.filename}"><h4>${p.title}</h4></a>
@@ -72,8 +74,7 @@ async function loadLatest() {
 
     if (extrasArea) {
         extrasArea.innerHTML = extras
-            .slice(-2)
-            .reverse()
+            .slice(0, 2)
             .map(e => `
                 <div class="preview-item">
                     <a href="view.html?type=extras&file=${e.filename}"><h4>${e.title}</h4></a>
