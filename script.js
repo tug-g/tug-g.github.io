@@ -19,13 +19,13 @@ if (savedTheme) {
 }
 
 async function listFiles(type) {
-    const url = `https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${type}`;
+    const url = `https://api.github.com/repos/tug-g/tug-g.github.io/contents/${type}`;
     const res = await fetch(url);
     return await res.json();
 }
 
 async function loadMarkdown(type, filename) {
-    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/${filename}`;
+    const url = `https://raw.githubusercontent.com/Ytug-g/tug-g.github.io/main/${type}/${filename}`;
     const res = await fetch(url);
     return await res.text();
 }
