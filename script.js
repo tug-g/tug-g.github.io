@@ -18,21 +18,7 @@ if (savedTheme) {
     if (toggleBtn) toggleBtn.textContent = savedTheme === "dark" ? "Light Mode" : "Dark Mode";
 }
 
-
-async function listFiles(type) {
-    const url = `https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${type}`;
-    const res = await fetch(url);
-    return await res.json();
-}
-
-
-async function loadMarkdown(type, filename) {
-    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/${filename}`;
-    const res = await fetch(url);
-    return await res.text();
-}
-
-
+// markdown parser
 function mdToHtml(md) {
     return md
         .replace(/^### (.*$)/gim, "<h3>$1</h3>")
@@ -44,43 +30,45 @@ function mdToHtml(md) {
         .replace(/\n/gim, "<br>");
 }
 
+// fetch
+async function loadList(type) {
+    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/index.json`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const list = await res.json();
+    return list;
+}
 
+async function loadMarkdown(type, filename) {
+    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/${filename}`;
+    const res = await fetch(url);
+    return await res.text();
+}
+
+// list
 const listContainer = document.getElementById("list-container");
 const viewContent = document.getElementById("view-content");
 
-// Posts/extras
 if (listContainer) {
     const type = document.title.includes("Extras") ? "extras" : "posts";
-
-    listFiles(type).then(files => {
-        files.forEach(file => {
-            if (file.name.endsWith(".md")) {
-                const item = document.createElement("div");
-                item.classList.add("list-item");
-
-                const title = file.name.replace(".md", "").replace(/-/g, " ");
-
-                item.innerHTML = `
-                    <a href="view.html?type=${type}&file=${file.name}">
-                        ${title}
-                    </a>
-                `;
-
-                listContainer.appendChild(item);
-            }
+    loadList(type).then(items => {
+        items.forEach(item => {
+            const div = document.createElement("div");
+            div.classList.add("list-item");
+            div.innerHTML = `<a href="view.html?type=${type}&file=${item.filename}">${item.title}</a>`;
+            listContainer.appendChild(div);
         });
     });
 }
 
-// View
+// view
 if (viewContent) {
     const params = new URLSearchParams(window.location.search);
     const type = params.get("type");
     const file = params.get("file");
 
     loadMarkdown(type, file).then(md => {
-        document.getElementById("view-title").textContent =
-            file.replace(".md", "").replace(/-/g, " ");
+        document.getElementById("view-title").textContent = file.replace(".md", "").replace(/-/g, " ");
         viewContent.innerHTML = mdToHtml(md);
     });
 }
