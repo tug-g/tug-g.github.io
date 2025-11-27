@@ -86,7 +86,8 @@ async function loadLatest() {
 // list page
 const listContainer = document.getElementById("list-container");
 if (listContainer) {
-    const type = document.title.includes("Extras") ? "extras" : "posts";
+    const type = listContainer.dataset.type;
+    
     loadIndex(type).then(items => {
         items.forEach(item => {
             const div = document.createElement("div");
