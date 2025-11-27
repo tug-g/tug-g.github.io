@@ -26,8 +26,7 @@ function mdToHtml(md) {
         .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
         .replace(/\*(.*?)\*/gim, "<em>$1</em>")
         .replace(/---/gim, "<hr>")
-        .replace(/
-/gim, "<br>");
+        .replace(/\n/gim, "<br>");
 }
 
 // json
