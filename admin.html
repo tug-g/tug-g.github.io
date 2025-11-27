@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estariot Admin</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="light">
+
+<header>
+    <h1>Admin Pannel</h1>
+    <button id="theme-toggle" class="theme-btn">Dark Mode</button>
+</header>
+
+<main class="admin-panel">
+
+    <section class="admin-auth">
+        <h2>GitHub Authentication</h2>
+
+        <label>GitHub Username</label>
+        <input id="gh-user" placeholder="your-username" />
+
+        <label>Repository Name</label>
+        <input id="gh-repo" placeholder="your-repository" />
+
+        <label>GitHub Token</label>
+        <input id="gh-token" type="password" placeholder="Paste token here" />
+
+        <button id="auth-save" class="btn">Enable Admin</button>
+        <p class="auth-status"></p>
+    </section>
+
+    <section id="editor-section" style="display:none;">
+        <h2>Create New Post / Extra</h2>
+
+        <label>Type</label>
+        <select id="content-type">
+            <option value="posts">Post</option>
+            <option value="extras">Extra</option>
+        </select>
+
+        <label>Title</label>
+        <input id="post-title" placeholder="My Post Title" />
+
+        <label>Tags</label>
+        <input id="post-tags" placeholder="update, story, devlog" />
+
+        <label>Content</label>
+        <textarea id="post-content" rows="12" placeholder="Write your content here..."></textarea>
+
+        <button id="submit-post" class="btn">Publish</button>
+        <p id="editor-status"></p>
+    </section>
+
+</main>
+
+<script src="admin.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
