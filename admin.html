@@ -1,61 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Estariot Admin</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Pannel</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, textarea { width: 100%; margin: 8px 0; padding: 8px; }
+    button { padding: 10px 15px; cursor: pointer; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
 </head>
-<body data-theme="light">
+<body>
+  <h1>Admin Pannel</h1>
+  <p>Add a Post or Extra</p>
 
-<header>
-    <h1>Admin Pannel</h1>
-    <button id="theme-toggle" class="theme-btn">Dark Mode</button>
-</header>
+  <label>GitHub Token:</label>
+  <input type="password" id="token" placeholder="ghp_XXXXXXXXXXXXXXXXXXXXXXXX" />
 
-<main class="admin-panel">
+  <label>Title:</label>
+  <input id="title" placeholder="My First Post" />
 
-    <section class="admin-auth">
-        <h2>GitHub Authentication</h2>
+  <label>Content:</label>
+  <textarea id="content" rows="10" placeholder="Write your content here..."></textarea>
 
-        <label>GitHub Username</label>
-        <input id="gh-user" placeholder="your-username" />
+  <label>Type:</label>
+  <select id="type">
+    <option value="posts">Post</option>
+    <option value="extras">Extra</option>
+  </select>
 
-        <label>Repository Name</label>
-        <input id="gh-repo" placeholder="your-repository" />
+  <button onclick="uploadFile()">Upload</button>
 
-        <label>GitHub Token</label>
-        <input id="gh-token" type="password" placeholder="Paste token here" />
+  <p id="status"></p>
 
-        <button id="auth-save" class="btn">Enable Admin</button>
-        <p class="auth-status"></p>
-    </section>
+  <script>
+    async function uploadFile() {
+      const token = document.getElementById('token').value.trim();
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value;
+      const type = document.getElementById('type').value;
+      const status = document.getElementById('status');
 
-    <section id="editor-section" style="display:none;">
-        <h2>Create New Post / Extra</h2>
+      status.textContent = "";
 
-        <label>Type</label>
-        <select id="content-type">
-            <option value="posts">Post</option>
-            <option value="extras">Extra</option>
-        </select>
+      if (!token || !title || !content) {
+        status.textContent = "All fields are required.";
+        status.className = "error";
+        return;
+      }
 
-        <label>Title</label>
-        <input id="post-title" placeholder="My Post Title" />
+      const username = "tug-g"; 
+      const repo = "tug-g.github.io"; 
+      const branch = "main";
 
-        <label>Tags</label>
-        <input id="post-tags" placeholder="update, story, devlog" />
+      const path = `${type}/${title.replace(/\s+/g, '-').toLowerCase()}.md`;
+      const url = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
 
-        <label>Content</label>
-        <textarea id="post-content" rows="12" placeholder="Write your content here..."></textarea>
+      const encoded = btoa(unescape(encodeURIComponent(content)));
 
-        <button id="submit-post" class="btn">Publish</button>
-        <p id="editor-status"></p>
-    </section>
+      const body = {
+        message: `Add ${type} → ${title}`,
+        content: encoded,
+        branch: branch
+      };
 
-</main>
+      try {
+        const res = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Authorization": `token ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
 
-<script src="admin.js"></script>
-<script src="script.js"></script>
+        if (!res.ok) {
+          const err = await res.json();
+          status.textContent = "Error: " + (err.message || res.statusText);
+          status.className = "error";
+          return;
+        }
+
+        status.textContent = "Upload successful!";
+        status.className = "success";
+
+      } catch (error) {
+        status.textContent = "Network error: " + error;
+        status.className = "error";
+      }
+    }
+  </script>
 </body>
 </html>
