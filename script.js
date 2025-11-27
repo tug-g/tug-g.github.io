@@ -18,33 +18,37 @@ if (savedTheme) {
     if (toggleBtn) toggleBtn.textContent = savedTheme === "dark" ? "Light Mode" : "Dark Mode";
 }
 
+
 async function listFiles(type) {
-    const url = `https://api.github.com/repos/tug-g/tug-g.github.io/contents/${type}`;
+    const url = `https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${type}`;
     const res = await fetch(url);
     return await res.json();
 }
 
+
 async function loadMarkdown(type, filename) {
-    const url = `https://raw.githubusercontent.com/Ytug-g/tug-g.github.io/main/${type}/${filename}`;
+    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/${filename}`;
     const res = await fetch(url);
     return await res.text();
 }
 
+
 function mdToHtml(md) {
     return md
-        .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-        .replace(/^## (.*$)/gim, "<h2>$1</h2>")
         .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+        .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+        .replace(/^# (.*$)/gim, "<h1>$1</h1>")
         .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
         .replace(/\*(.*?)\*/gim, "<em>$1</em>")
         .replace(/---/gim, "<hr>")
         .replace(/\n/gim, "<br>");
 }
 
+
 const listContainer = document.getElementById("list-container");
 const viewContent = document.getElementById("view-content");
 
-// Posts/extras listing page
+// Posts/extras
 if (listContainer) {
     const type = document.title.includes("Extras") ? "extras" : "posts";
 
@@ -68,7 +72,7 @@ if (listContainer) {
     });
 }
 
-// View page
+// View
 if (viewContent) {
     const params = new URLSearchParams(window.location.search);
     const type = params.get("type");
