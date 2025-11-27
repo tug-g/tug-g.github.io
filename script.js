@@ -1,4 +1,4 @@
-
+// theme
 const body = document.body;
 const toggleBtn = document.getElementById("theme-toggle");
 
@@ -17,8 +17,7 @@ if (savedTheme) {
     body.setAttribute("data-theme", savedTheme);
     if (toggleBtn) toggleBtn.textContent = savedTheme === "dark" ? "Light Mode" : "Dark Mode";
 }
-
-// markdown parser
+// markdown
 function mdToHtml(md) {
     return md
         .replace(/^### (.*$)/gim, "<h3>$1</h3>")
@@ -27,31 +26,69 @@ function mdToHtml(md) {
         .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
         .replace(/\*(.*?)\*/gim, "<em>$1</em>")
         .replace(/---/gim, "<hr>")
-        .replace(/\n/gim, "<br>");
+        .replace(/
+/gim, "<br>");
 }
 
-// fetch
-async function loadList(type) {
-    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/index.json`;
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const list = await res.json();
-    return list;
+// json
+async function loadIndex(type) {
+    const url = `https://raw.githubusercontent.com/tug-g/tug-g.github.io/main/${type}/index.json`;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        return await res.json();
+    } catch {
+        return [];
+    }
 }
 
+// fetch md
 async function loadMarkdown(type, filename) {
-    const url = `https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/${type}/${filename}`;
+    const url = `https://raw.githubusercontent.com/tug-g/tug-g.github.io/main/${type}/${filename}`;
     const res = await fetch(url);
     return await res.text();
 }
 
-// list
-const listContainer = document.getElementById("list-container");
-const viewContent = document.getElementById("view-content");
+// home page 2 post 2 extras
+async function loadLatest() {
+    const postsArea = document.getElementById("latest-posts");
+    const extrasArea = document.getElementById("latest-extras");
 
+    if (!postsArea && !extrasArea) return;
+
+    const posts = await loadIndex("posts");
+    const extras = await loadIndex("extras");
+
+    if (postsArea) {
+        postsArea.innerHTML = posts
+            .slice(-2)
+            .reverse()
+            .map(p => `
+                <div class="preview-item">
+                    <a href="view.html?type=posts&file=${p.filename}"><h4>${p.title}</h4></a>
+                    <p>${p.date}</p>
+                </div>
+            `).join("");
+    }
+
+    if (extrasArea) {
+        extrasArea.innerHTML = extras
+            .slice(-2)
+            .reverse()
+            .map(e => `
+                <div class="preview-item">
+                    <a href="view.html?type=extras&file=${e.filename}"><h4>${e.title}</h4></a>
+                    <p>${e.date}</p>
+                </div>
+            `).join("");
+    }
+}
+
+// list page
+const listContainer = document.getElementById("list-container");
 if (listContainer) {
     const type = document.title.includes("Extras") ? "extras" : "posts";
-    loadList(type).then(items => {
+    loadIndex(type).then(items => {
         items.forEach(item => {
             const div = document.createElement("div");
             div.classList.add("list-item");
@@ -61,7 +98,8 @@ if (listContainer) {
     });
 }
 
-// view
+// view html
+const viewContent = document.getElementById("view-content");
 if (viewContent) {
     const params = new URLSearchParams(window.location.search);
     const type = params.get("type");
@@ -72,3 +110,6 @@ if (viewContent) {
         viewContent.innerHTML = mdToHtml(md);
     });
 }
+
+// load
+loadLatest();
