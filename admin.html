@@ -6,7 +6,7 @@
   <title>Admin Pannel</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    input, textarea { width: 100%; margin: 8px 0; padding: 8px; }
+    input, textarea, select { width: 100%; margin: 8px 0; padding: 8px; }
     button { padding: 10px 15px; cursor: pointer; }
     .error { color: red; }
     .success { color: green; }
@@ -16,14 +16,14 @@
   <h1>Admin Pannel</h1>
   <p>Add a Post or Extra</p>
 
-  <label>GitHub Token:</label>
+  <label>GitHub Token (never share this):</label>
   <input type="password" id="token" placeholder="ghp_XXXXXXXXXXXXXXXXXXXXXXXX" />
 
   <label>Title:</label>
-  <input id="title" placeholder="My First Post" />
+  <input id="title" placeholder="Title" />
 
   <label>Content:</label>
-  <textarea id="content" rows="10" placeholder="Write your content here..."></textarea>
+  <textarea id="content" rows="10" placeholder="Content"></textarea>
 
   <label>Type:</label>
   <select id="type">
@@ -51,43 +51,71 @@
         return;
       }
 
-      const username = "tug-g"; 
-      const repo = "tug-g.github.io"; 
+      const username = "tug-g";
+      const repo = "tug-g.github.io";
       const branch = "main";
-
-      const path = `${type}/${title.replace(/\s+/g, '-').toLowerCase()}.md`;
+      const slug = title.replace(/\s+/g, '-').toLowerCase();
+      const path = `${type}/${slug}.md`;
       const url = `https://api.github.com/repos/${username}/${repo}/contents/${path}`;
 
-      const encoded = btoa(unescape(encodeURIComponent(content)));
-
-      const body = {
-        message: `Add ${type} → ${title}`,
-        content: encoded,
-        branch: branch
-      };
+      const encodedContent = btoa(unescape(encodeURIComponent(content)));
 
       try {
-        const res = await fetch(url, {
+        // Upload Markdown file
+        await fetch(url, {
           method: "PUT",
           headers: {
             "Authorization": `token ${token}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify(body)
+          body: JSON.stringify({
+            message: `Add ${type.slice(0,-1)}: ${title}`,
+            content: encodedContent,
+            branch: branch
+          })
         });
 
-        if (!res.ok) {
-          const err = await res.json();
-          status.textContent = "Error: " + (err.message || res.statusText);
-          status.className = "error";
-          return;
+        // ---- Update index.json ----
+        const indexPath = `${type}/index.json`;
+        const indexUrl = `https://api.github.com/repos/${username}/${repo}/contents/${indexPath}`;
+
+        let indexRes = await fetch(indexUrl);
+        let sha = null;
+        let list = [];
+
+        if (indexRes.ok) {
+          const data = await indexRes.json();
+          sha = data.sha;
+          list = JSON.parse(atob(data.content));
         }
+
+        const newItem = {
+          title: title,
+          filename: `${slug}.md`,
+          date: new Date().toISOString().split('T')[0]
+        };
+
+        list.push(newItem);
+
+        await fetch(indexUrl, {
+          method: "PUT",
+          headers: {
+            "Authorization": `token ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Update ${type} index.json`,
+            content: btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))),
+            branch: branch,
+            sha: sha
+          })
+        });
 
         status.textContent = "Upload successful!";
         status.className = "success";
 
       } catch (error) {
-        status.textContent = "Network error: " + error;
+        status.textContent = "Error: " + error;
         status.className = "error";
       }
     }
